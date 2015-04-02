@@ -1,0 +1,8 @@
+{
+  "server": "something.com",
+  "ssl": true,
+  "port": 6697,
+  "nick": "besos",
+  "user": "besos",
+  "password": "whatever",
+  "rooms": ["#bot_testing"]}
