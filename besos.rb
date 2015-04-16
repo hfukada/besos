@@ -4,42 +4,47 @@ require './player.rb'
 
 class Besos
   def initialize()
-    config = JSON.parse(File.read('config.json'))
-
+    @config = JSON.parse(File.read('config.json'))
     @players = {}
     @words = File.read('words.txt').split "\n"
-    @penalty = config['penalty']
+    @penalty = @config['penalty']
+    @bot = nil
+  end
+
+  def run()
+    puts "starting besos."
     @bot = Cinch::Bot.new do
       configure do |c|
-        c.server = config['server']
+        c.server = @config['server']
         c.ssl.use = true
-        c.port = config['port']
-        c.nick = config['nick']
-        c.user = config['user']
-        c.password = config['password']
-        c.channels = config['rooms']
+        c.port = @config['port']
+        c.nick = @config['nick']
+        c.user = @config['user']
+        c.password = @config['password']
+        c.channels = @config['rooms']
       end
 
-      on :message /^!play$/ do |sender,to,message|
-        send_to_player sender, add_player(sender)
+      on :message, /^!play$/ do |sender,to,message|
+        sender.reply add_player(sender)
       end
 
-      on :message /^!giveup$/ do |sender,to,message|
-        send_to_player sender, swap_target(sender)
+      on :message, /^!giveup$/ do |sender,to,message|
+        sender.reply swap_target(sender)
       end
 
-      on :message /^!quit$/ do |sender,to,message|
-        send_to_player sender, remove_player(sender)
+      on :message, /^!quit$/ do |sender,to,message|
+        sender.reply remove_player(sender)
       end
 
-      on :message /^!score$/ do |sender,to,message|
-        send_to_player sender, print_scoreboard(sender)
+      on :message, /^!score$/ do |sender,to,message|
+        sender.reply print_scoreboard(sender)
       end
 
-      on :message /^!gamehelp$/ do |sender,to,message|
-        send_to_player sender, print_help(sender)
+      on :message, /^!gamehelp$/ do |sender,to,message|
+        sender.reply print_help(sender)
       end
     end
+    @bot.start
   end
 
   def add_player(name)
@@ -66,6 +71,9 @@ class Besos
     }
   end
 end
+
+
+Besos.new.run
 
 #bot = Cinch::Bot.new do
 #  configure do |c|
