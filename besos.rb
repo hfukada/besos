@@ -47,6 +47,8 @@ class Besos
         def release_word(name)
           $words.push($taboo.select{|w,p| p["reward"] == name}.first.first)
           $taboo.delete($taboo.select{|w,p| p["reward"] == name}.first.first)
+          puts $words
+          puts $taboo
         end
 
         def rand_word()
@@ -63,16 +65,17 @@ class Besos
 
         def assign_target(name)
           t_word = rand_word
-          target=rand_target(name)
+          target=rand_target name
           $taboo[t_word] = {"reward" => name, "target" => target}
           {"target" => target, "t_word" => t_word}
         end
 
-        def reward_player(player)
+        def reward_player(player, dead, word)
           $players[player]["score"] += 5
           release_word player
           t=assign_target player
-          User(player).send "Congratulations, you've successfully accomplished your mission. I'll be awarding you accordingly. Good work...
+          dead.send "You find yourself in a dark alley. Suddenly you feel a swift blow to the back of your neck. You wake up in a mud puddle. You can't remember much but you find a damp note that reads \"you've been hit by #{player} for saying #{word}\""
+          User(player).send "Congratulations, you've successfully accomplished your mission. You've given #{player} the swift hit for saying #{word}. I'll be awarding you accordingly. Good work...
 Your new target is sure to be found in the #general channel. This fellow goes by the name of #{t["target"]}. I need you to cough up the word '#{t["t_word"]}'. I know you can do it. Don't let me down"
         end
 
@@ -84,14 +87,16 @@ Your new target is sure to be found in the #general channel. This fellow goes by
         end
 
         def remind(player)
-          w = $taboo.select{|w,p| p["reward"] == player.nick}.first
+          w = $taboo.select{|w,p| p["reward"] == player}.first
           "Your mission is to make #{w[1]["target"]} say '#{w.first}'. If you can't, I could probably find you some new work if you type !giveup but it'll cost you a few marks. I hope you don't have to resort to !giveup. I'm counting on you."
           end
 
         def add_player(name)
-          $players[name] = {"name"=> name, "score" => 0}
-          t=assign_target name
-          "You have joined. Welcome to the Slack Mafia of the Farmlouge District. I have a mission for you: I need you to slyly make #{t["target"]} say '#{t["t_word"]}' using any means neccessary. Good luck."
+          if $players[name].nil?
+            $players[name] = {"name"=> name, "score" => 0}
+            t=assign_target name
+            "You have joined. Welcome to the Slack Mafia of the Farmlouge District. I have a mission for you: I need you to slyly make #{t["target"]} say '#{t["t_word"]}' using any means neccessary. Good luck."
+          end
         end
 
         def remove_player(name)
@@ -118,7 +123,7 @@ Note: in this game version you cannot die. you simply are rewarded or penalized 
         end
 
         def process(sender, message)
-          message.split.each{|w| if $taboo[w] and $taboo[w]["target"] == sender.nick then reward_player $taboo[w]["reward"] end}
+          message.split.each{|w| if $taboo[w] and $taboo[w]["target"] == sender then reward_player $taboo[w]["reward"], sender, w end}
         end
       end
 
@@ -129,30 +134,32 @@ Note: in this game version you cannot die. you simply are rewarded or penalized 
       on :message, /^!adminrestore$/ do |m|
         if m.user.nick == $owner
           restore_state
+          m.user.send "State restored"
         end
       end
 
       on :message, /^!adminsave$/ do |m|
         if m.user.nick == $owner
           save_state
+          m.user.send "State saved"
         end
       end
 
       on :message, /^!join$/ do |m, who, text|
         puts "User #{m.user} wants to play"
-        m.user.send add_player(m.user)
+        m.user.send add_player(m.user.nick)
       end
 
       on :message, /^!remind$/ do |m|
-        m.user.send remind(m.user)
+        m.user.send remind(m.user.nick)
       end
 
       on :message, /^!giveup$/ do |m|
-        m.user.send swap_target(m.user)
+        m.user.send swap_target(m.user.nick)
       end
 
       on :message, /^!quit$/ do |m, who, text|
-        m.user.send remove_player(m.user)
+        m.user.send remove_player(m.user.nick)
       end
 
       on :message, /^!score$/ do |m|
@@ -160,7 +167,7 @@ Note: in this game version you cannot die. you simply are rewarded or penalized 
       end
 
       on :message, /^!besos$/ do |m|
-        m.reply print_help()
+        m.user.send print_help()
       end
     end
 
