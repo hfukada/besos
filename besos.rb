@@ -45,11 +45,8 @@ class Besos
         end
 
         def release_word(name)
-          puts "return #{$taboo.select{|w,p| puts p
-                             p["reward"] == name}}"
           $words.push($taboo.select{|w,p| p["reward"] == name}.first.first)
           $taboo.delete($taboo.select{|w,p| p["reward"] == name}.first.first)
-          puts "final: #{$words}"
         end
 
         def rand_word()
@@ -94,10 +91,10 @@ Your new target is sure to be found in the #general channel. This fellow goes by
 
         def add_player(name)
           if $players[name].nil?
-            puts "User #{m.user} wants to play"
+            puts "User #{name} wants to play"
             $players[name] = {"name"=> name, "score" => 0}
             t=assign_target name
-            puts $words
+            puts "Word pool size #{$words.size}"
             "You have joined. Welcome to the Slack Mafia of the Farmlouge District. I have a mission for you: I need you to slyly make #{t["target"]} say '#{t["t_word"]}' using any means neccessary. Good luck."
           end
         end
