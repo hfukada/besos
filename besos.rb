@@ -93,7 +93,8 @@ class Besos
             !quit: remove yourself from the game
             !score: prints the leaderboard
             !remind: reminds you what your mission is.
-            !giveup: give up on your current mission, get another at a penalty of #{$penalty} points"
+            !giveup: give up on your current mission, get another at a penalty of #{$penalty} points
+          Note: in this game version you cannot die. you simply are rewarded or penalized points. Game goes on until this bot dies or botmaster turns this off"
         end
 
         def print_scoreboard()
