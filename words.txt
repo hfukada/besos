@@ -21,3 +21,14 @@ terminal
 chicken
 bacon
 beer
+bottle
+code
+keyboard
+mouse
+macbook
+iphone
+android
+technology
+irc
+nerd
+cook
