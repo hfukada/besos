@@ -45,10 +45,11 @@ class Besos
         end
 
         def release_word(name)
+          puts "return #{$taboo.select{|w,p| puts p
+                             p["reward"] == name}}"
           $words.push($taboo.select{|w,p| p["reward"] == name}.first.first)
           $taboo.delete($taboo.select{|w,p| p["reward"] == name}.first.first)
-          puts $words
-          puts $taboo
+          puts "final: #{$words}"
         end
 
         def rand_word()
@@ -74,7 +75,7 @@ class Besos
           $players[player]["score"] += 5
           release_word player
           t=assign_target player
-          dead.send "You find yourself in a dark alley. Suddenly you feel a swift blow to the back of your neck. You wake up in a mud puddle. You can't remember much but you find a damp note that reads \"you've been hit by #{player} for saying #{word}\""
+          User(dead).send "You find yourself in a dark alley. Suddenly you feel a swift blow to the back of your neck. You wake up in a mud puddle. You can't remember much but you find a damp note that reads \"you've been hit by #{player} for saying #{word}\""
           User(player).send "Congratulations, you've successfully accomplished your mission. You've given #{player} the swift hit for saying #{word}. I'll be awarding you accordingly. Good work...
 Your new target is sure to be found in the #general channel. This fellow goes by the name of #{t["target"]}. I need you to cough up the word '#{t["t_word"]}'. I know you can do it. Don't let me down"
         end
@@ -83,7 +84,7 @@ Your new target is sure to be found in the #general channel. This fellow goes by
           release_word player
           $players[player]["score"] -= $penalty
           t=assign_target player
-          "I see. Well, if you can't handle it, you can't handle it. Fortunately for you, an Assassin's work is never done. I'll give you a new mission... but it's going to cost you a mark.  Ahh, I found something in the deep in the books. Your mission is now to coerce #{t["target"]} into saying: '#{t[:t_word]}'"
+          "I see. Well, if you can't handle it, you can't handle it. Fortunately for you, an Assassin's work is never done. I'll give you a new mission... but it's going to cost you a mark.  Ahh, I found something in the deep in the books. Your mission is now to coerce #{t["target"]} into saying: '#{t["t_word"]}'"
         end
 
         def remind(player)
@@ -93,8 +94,10 @@ Your new target is sure to be found in the #general channel. This fellow goes by
 
         def add_player(name)
           if $players[name].nil?
+            puts "User #{m.user} wants to play"
             $players[name] = {"name"=> name, "score" => 0}
             t=assign_target name
+            puts $words
             "You have joined. Welcome to the Slack Mafia of the Farmlouge District. I have a mission for you: I need you to slyly make #{t["target"]} say '#{t["t_word"]}' using any means neccessary. Good luck."
           end
         end
@@ -109,7 +112,6 @@ Your new target is sure to be found in the #general channel. This fellow goes by
           "Welcome to Besos. An assasins style chat game. Once you join, you will get a mission. Your mission is to get your target to say a specific word. When your target says that word, you will be rewarded with their bounty. Default it 3 points.
 Available commands:
 !besos: displays this message
-!join: add yourself to the game
 !join: add yourself to the game
 !quit: remove yourself from the game
 !score: prints the leaderboard
@@ -128,7 +130,7 @@ Note: in this game version you cannot die. you simply are rewarded or penalized 
       end
 
       on :message, /.*/ do |m|
-        process(m.user, m.message)
+        process(m.user.nick, m.message)
       end
 
       on :message, /^!adminrestore$/ do |m|
@@ -146,7 +148,6 @@ Note: in this game version you cannot die. you simply are rewarded or penalized 
       end
 
       on :message, /^!join$/ do |m, who, text|
-        puts "User #{m.user} wants to play"
         m.user.send add_player(m.user.nick)
       end
 
