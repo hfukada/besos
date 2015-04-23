@@ -122,7 +122,7 @@ Note: in this game version you cannot die. you simply are rewarded or penalized 
         end
 
         def process(sender, message)
-          message.split.each{|w| if $taboo[w] and $taboo[w]["target"] == sender then reward_player $taboo[w]["reward"], sender, w end}
+          message.split.each{|w| if $taboo[w.downcase] and $taboo[w.downcase]["target"] == sender then reward_player $taboo[w.downcase]["reward"], sender, w.downcase end}
         end
       end
 
