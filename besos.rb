@@ -73,7 +73,7 @@ class Besos
           release_word player
           t=assign_target player
           User(dead).send "You find yourself in a dark alley. Suddenly you feel a swift blow to the back of your neck. You wake up in a mud puddle. You can't remember much but you find a damp note that reads \"you've been hit by #{player} for saying #{word}\""
-          User(player).send "Congratulations, you've successfully accomplished your mission. You've given #{player} the swift hit for saying #{word}. I'll be awarding you accordingly. Good work...
+          User(player).send "Congratulations, you've successfully accomplished your mission. You've given #{dead} the swift hit for saying #{word}. I'll be awarding you accordingly. Good work...
 Your new target is sure to be found in the #general channel. This fellow goes by the name of #{t["target"]}. I need you to cough up the word '#{t["t_word"]}'. I know you can do it. Don't let me down"
         end
 
